@@ -1,0 +1,29 @@
+{
+  "name": "avm-orchestra",
+  "version": "1.0.0",
+  "description": "Integrating NodeJs + P5.js with experimental microphones to interact within alike Orchestra experience.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gawss/AVM-Orchestra.git"
+  },
+  "keywords": [
+    "Interaction",
+    "Sound",
+    "Collaborative",
+    "Experience"
+  ],
+  "author": "Gawss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Gawss/AVM-Orchestra/issues"
+  },
+  "homepage": "https://github.com/Gawss/AVM-Orchestra#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
