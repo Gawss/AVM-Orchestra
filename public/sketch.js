@@ -35,6 +35,7 @@ function draw() {
         // Draw an ellipse with height based on volume
         h = map(vol*100, 0, 1, 200, 0);
         text(vol*100, 10, 10);
+        text("Current Players: " + numPlayers, 10, 50);
 
         if(socket.connected){
             SendInput(vol);
@@ -73,6 +74,10 @@ socket.on('mouse', data => {
 
 socket.on('microphone', data => {
     console.log('ECHO microphone: ' + data);
+})
+
+socket.on('players', data => {
+    numPlayers = data.numPlayers;
 })
 
 function SendInput(volume){

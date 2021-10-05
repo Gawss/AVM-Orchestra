@@ -5,6 +5,8 @@ const app = express();
 
 let SERVER_PORT = 1337;
 
+let numPlayers = 0;
+
 app.use(express.static(__dirname + '/public'));
 
 const server = app.listen(process.env.PORT || SERVER_PORT, () => {
@@ -32,6 +34,15 @@ app.get('/', (req, res) => {
 const io = require('socket.io')(server);
 
 io.sockets.on('connection', (socket) => {
+
+    numPlayers++;
+
+    var _data = {
+        numPlayers: numPlayers
+    }
+
+    io.emit('players', _data);
+
     console.log('Client connected: ' + socket.id)
     socket.on('mouse', (data) => {
         socket.broadcast.emit('mouse', data);
@@ -40,8 +51,18 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('microphone', (data) => {
-        console.log(data);
+        socket.broadcast.emit('microphone', data);
     })
 
-    socket.on('disconnect', () => console.log('Client has disconnected'))
+    socket.on('disconnect', () => {
+        console.log('Client has disconnected');
+
+        numPlayers--;
+
+        var data = {
+            numPlayers: numPlayers
+        }
+
+        socket.broadcast.emit('numPlayers', data);
+    })
 })
