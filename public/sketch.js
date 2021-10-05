@@ -4,7 +4,8 @@ let h = 50;
 
 let socket;
 
-socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
+socket = io.connect(location.origin);
+// socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
 // socket = io.connect('http://localhost:1337')
 
 socket.on("connect", () => {
