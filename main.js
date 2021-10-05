@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 
 const app = express();
@@ -16,14 +17,31 @@ app.use(express.static(__dirname + '/public/resources'));
 app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {    
     console.log('GET /');
-
+    
     // //Load different file in localMode
     // if(process.env.PORT != undefined){
-    //     res.sendFile(__dirname + '/public/inprogress.html');
-    // }else{
-    //     //Load different file in Online Mode
-    //     res.sendFile(__dirname + '/public/main.html');
-    // }
+        //     res.sendFile(__dirname + '/public/inprogress.html');
+        // }else{
+            //     //Load different file in Online Mode
+            //     res.sendFile(__dirname + '/public/main.html');
+            // }
+            
+            res.sendFile(__dirname + '/public/main.html');
+        });
+        
+const io = require('socket.io')(server);
 
-    res.sendFile(__dirname + '/public/main.html');
-});
+io.sockets.on('connection', (socket) => {
+    console.log('Client connected: ' + socket.id)
+    socket.on('mouse', (data) => {
+        socket.broadcast.emit('mouse', data);
+        // io.emit('mouse', data);
+        console.log(data);
+    })
+
+    socket.on('microphone', (data) => {
+        console.log(data);
+    })
+
+    socket.on('disconnect', () => console.log('Client has disconnected'))
+})

@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/Gawss/AVM-Orchestra#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "4": "0.0.0",
+    "express": "^4.17.1",
+    "socket.io": "^4.2.0"
   }
 }

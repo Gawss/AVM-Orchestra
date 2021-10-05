@@ -1,6 +1,19 @@
 let mic;
 let hasStarted = false;
 let h = 50;
+
+let socket;
+
+socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket' || 'http://localhost:1337')
+// socket = io.connect('http://localhost:1337')
+
+socket.on("connect", () => {
+    console.log(socket.id + " connected: " + socket.connected); // true
+});
+
+
+let numPlayers = 0;
+
 function setup() {
     createCanvas(windowWidth, windowHeight);
 
@@ -21,6 +34,10 @@ function draw() {
         // Draw an ellipse with height based on volume
         h = map(vol*100, 0, 1, 200, 0);
         text(vol*100, 10, 10);
+
+        if(socket.connected){
+            SendInput(vol);
+        }
     }
 }
 
@@ -42,4 +59,32 @@ function touchStarted() {
         // Enable the audio context in the browser
         getAudioContext().resume();
     }
+}
+
+function mousePressed(){
+    console.log("mousePressed");
+    sendmouse(mouseX, mouseY);
+}
+
+socket.on('mouse', data => {
+    console.log(data);
+})
+
+socket.on('microphone', data => {
+    console.log('ECHO microphone: ' + data);
+})
+
+function SendInput(volume){
+    const data = {
+        volume: volume
+    }
+    socket.emit('microphone', data);
+}
+
+function sendmouse(x, y) {
+    const data = {
+     x: x,
+     y: y
+    }
+    socket.emit('mouse', data)
 }
