@@ -25,7 +25,8 @@ function setup() {
 function draw() {
     background(255);
     fill(0);
-    ellipse(windowWidth / 2, windowHeight/2, h, h);
+
+    drawPlayers(numPlayers);
 
     if(getAudioContext().state === 'running'){
         // Get the overall volume (between 0 and 1.0)
@@ -40,6 +41,12 @@ function draw() {
         if(socket.connected){
             SendInput(vol);
         }
+    }
+}
+
+function drawPlayers(num){
+    for(let i=0; i<num; i++){
+        ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
     }
 }
 
