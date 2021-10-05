@@ -59,10 +59,10 @@ io.sockets.on('connection', (socket) => {
 
         numPlayers--;
 
-        var data = {
+        var _data = {
             numPlayers: numPlayers
         }
 
-        socket.broadcast.emit('numPlayers', data);
+        io.emit('players', _data);
     })
 })
