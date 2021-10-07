@@ -92,7 +92,7 @@ socket.on('players', data => {
 
 function SendInput(volume){
 
-    GetPlayer(socket.id).volume = vol;
+    GetPlayer(socket.id).volume = volume;
     
     var data = {
         volume: volume,
