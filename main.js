@@ -1,11 +1,13 @@
 const http = require('http');
 const express = require('express');
+const Player = require('./player.js').Player;
 
 const app = express();
 
 let SERVER_PORT = 1337;
 
-let numPlayers = 0;
+
+let players = []
 
 app.use(express.static(__dirname + '/public'));
 
@@ -35,15 +37,15 @@ const io = require('socket.io')(server);
 
 io.sockets.on('connection', (socket) => {
 
-    numPlayers++;
+    console.log('Client connected: ' + socket.id)
+    players.push(new Player(socket.id))
 
     var _data = {
-        numPlayers: numPlayers
+        players: players
     }
 
     io.emit('players', _data);
 
-    console.log('Client connected: ' + socket.id)
     socket.on('mouse', (data) => {
         socket.broadcast.emit('mouse', data);
         // io.emit('mouse', data);
@@ -57,12 +59,22 @@ io.sockets.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Client has disconnected');
 
-        numPlayers--;
+        players.pop(GetPlayer(socket.id))
 
         var _data = {
-            numPlayers: numPlayers
+            players: players
         }
 
         io.emit('players', _data);
     })
 })
+
+function GetPlayer(id){
+    for(let i= 0;i < players.length; i++){
+        if(players[i].id == id){
+            return players[i]
+        }
+    }
+
+    return null;
+}

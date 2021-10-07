@@ -12,8 +12,7 @@ socket.on("connect", () => {
     console.log(socket.id + " connected: " + socket.connected); // true
 });
 
-
-let numPlayers = 0;
+let players = [];
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -26,7 +25,7 @@ function draw() {
     background(255);
     fill(0);
 
-    drawPlayers(numPlayers);
+    drawPlayers(players.length);
 
     if(getAudioContext().state === 'running'){
         // Get the overall volume (between 0 and 1.0)
@@ -36,7 +35,7 @@ function draw() {
         // Draw an ellipse with height based on volume
         h = map(vol*100, 0, 1, 200, 0);
         text(vol*100, 10, 10);
-        text("Current Players: " + numPlayers, 10, 50);
+        text("Current Players: " + players.length, 10, 50);
 
         if(socket.connected){
             SendInput(vol);
@@ -47,6 +46,7 @@ function draw() {
 function drawPlayers(num){
     for(let i=0; i<num; i++){
         ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
+        text(players[i].id + " volume: " + players[i].volume, 10, (1+i)*15);
     }
 }
 
@@ -81,15 +81,20 @@ socket.on('mouse', data => {
 
 socket.on('microphone', data => {
     console.log('ECHO microphone: ' + data);
+    //playersVolume[playersID.indexOf(data.player)] = data.volume;
 })
 
 socket.on('players', data => {
-    numPlayers = data.numPlayers;
+
+    players = data.players
+
+    console.log(playersID);
 })
 
 function SendInput(volume){
-    const data = {
-        volume: volume
+    var data = {
+        volume: volume,
+        player: socket.id
     }
     socket.emit('microphone', data);
 }
