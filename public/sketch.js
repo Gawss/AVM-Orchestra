@@ -80,21 +80,23 @@ socket.on('mouse', data => {
 })
 
 socket.on('microphone', data => {
-    console.log('ECHO microphone: ' + data);
-    //playersVolume[playersID.indexOf(data.player)] = data.volume;
+
+    GetPlayer(data.playerID).volume = data.volume;
 })
 
 socket.on('players', data => {
 
     players = data.players
 
-    console.log(playersID);
 })
 
 function SendInput(volume){
+
+    GetPlayer(socket.id).volume = vol;
+    
     var data = {
         volume: volume,
-        player: socket.id
+        playerID: socket.id
     }
     socket.emit('microphone', data);
 }
@@ -105,4 +107,14 @@ function sendmouse(x, y) {
      y: y
     }
     socket.emit('mouse', data)
+}
+
+function GetPlayer(id){
+    for(let i= 0;i < players.length; i++){
+        if(players[i].id == id){
+            return players[i]
+        }
+    }
+
+    return null;
 }
