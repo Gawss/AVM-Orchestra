@@ -18,8 +18,8 @@ const server = app.listen(process.env.PORT || SERVER_PORT, () => {
 
 
 app.use(express.static(__dirname + '/public/resources'));
-app.use(express.static(__dirname + '/public'));
-app.get('/', (req, res) => {    
+app.use(express.static(__dirname + '/public/Orchestra'));
+app.get('/Orchestra', (req, res) => {    
     console.log('GET /');
     
     // //Load different file in localMode
@@ -30,8 +30,14 @@ app.get('/', (req, res) => {
             //     res.sendFile(__dirname + '/public/main.html');
             // }
             
-            res.sendFile(__dirname + '/public/main.html');
-        });
+    res.sendFile(__dirname + '/public/Orchestra/main.html');
+});
+
+app.use('/images', express.static(__dirname + '/public/Calimero/Resources/Images'));
+app.use(express.static(__dirname + '/public/Calimero'));
+app.get('/Calimero', (req, res) => {
+    res.sendFile(__dirname + '/public/Calimero/calimero.html');
+});
         
 const io = require('socket.io')(server);
 
