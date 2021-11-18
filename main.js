@@ -68,10 +68,11 @@ io.sockets.on('connection', (socket) => {
         players.pop(GetPlayer(socket.id))
 
         var _data = {
-            players: players
+            players: players,
+            disconnected: socket.id
         }
 
-        io.emit('players', _data);
+        io.emit('playerDisconnected', _data);
     })
 })
 
