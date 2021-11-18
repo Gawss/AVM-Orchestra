@@ -53,8 +53,9 @@ function drawPlayers(num){
     for(let i=0; i<num; i++){
         h = map(players[i].volume*100, 0, 1, 200, 0);
         ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
-        activeLines[i].update(map(players[i].volume, 0, windowHeight, -1, 1));
+        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
         activeLines[i].draw();
+        noStroke();
         text(players[i].id + " volume: " + players[i].volume, 10, (1+i)*15);
     }
 
@@ -168,12 +169,16 @@ function GetPlayer(id){
 }
 
 function InsertLine(index){
-    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight/(index+1))+(25*(index))));
+    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight/(index+1))+(25*(index)), 
+        [random(255),
+        random(255),
+        random(255)]
+    ));
     activeLines[activeLines.length - 1].setup();
 }
 
 class sinWave{
-    constructor(focusPointX, lineLength, initialHeight){
+    constructor(focusPointX, lineLength, initialHeight, initialColor){
       
       this.lines = [];
       this.positions = {y0: initialHeight, x1:0, y1:0, x2:0, y2:0};
@@ -182,6 +187,7 @@ class sinWave{
       this.currentMaxPointX = 0;
       this.amplitude = 0;
       this.initialX = 0;
+      this.color = {r: initialColor[0], g: initialColor[1], b: initialColor[2]};
     }
     
     setup(){
@@ -208,19 +214,20 @@ class sinWave{
     }
     
     draw(){
+
+        stroke(this.color.r, this.color.g, this.color.b);
+        // stroke(100, 200, 50);
+        this.lines.forEach((item)=>{
+            line(this.initialX + item.value[0], item.value[1], this.initialX + item.value[2], item.value[3]);
+            this.currentMaxPointX = max(item.value[2], this.currentMaxPointX);
+        });
   
-      stroke(100, 200, 50);
-      this.lines.forEach((item)=>{
-        line(this.initialX + item.value[0], item.value[1], this.initialX + item.value[2], item.value[3]);
-        this.currentMaxPointX = max(item.value[2], this.currentMaxPointX);
-      });
-  
-      if(this.currentMaxPointX >= this.focusPointX){
-        this.initialX = this.initialX-1;
-        this.lines.shift();
-      }
-      
-      this.positions.x1 = this.positions.x2;
-      this.positions.y1 = this.positions.y2;
+        if(this.currentMaxPointX >= this.focusPointX){
+            this.initialX = this.initialX-1;
+            this.lines.shift();
+        }
+
+        this.positions.x1 = this.positions.x2;
+        this.positions.y1 = this.positions.y2;
     }
   }
