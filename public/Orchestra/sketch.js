@@ -8,6 +8,9 @@ let players = [];
 let activeLines = [];
 let mainSoundtrack;
 
+let fft;
+let spectrum;
+
 socket = io.connect(location.origin);
 // socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
 // socket = io.connect('http://localhost:1337')
@@ -25,7 +28,10 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
 
     // Create an Audio input
+    getAudioContext().suspend();
     mic = new p5.AudioIn();
+
+    fft = new p5.FFT();
 
     background(255);
 }
@@ -49,6 +55,19 @@ function draw() {
         if(socket.connected){
             SendInput(vol);
         }
+    }
+
+    drawSpectrum();
+}
+
+function drawSpectrum(){
+    spectrum = fft.analyze();
+    noStroke();
+    fill(255, 0, 255);
+    for (let i = 0; i< spectrum.length; i++){
+      let x = map(i, 0, spectrum.length, 0, width);
+      let h = -height + map(spectrum[i], 0, 255, height, 0);
+      rect(x, height, width / spectrum.length, h )
     }
 }
 
@@ -104,6 +123,8 @@ function mousePressed(){
     // sendmouse(mouseX, mouseY);
 
     if (getAudioContext().state !== 'running') {
+
+        userStartAudio();
         
         // start the Audio Input.
         // By default, it does not .connect() (to the computer speakers)
