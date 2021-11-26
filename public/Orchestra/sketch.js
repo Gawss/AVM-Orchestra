@@ -6,7 +6,7 @@ let socket;
 
 let players = [];
 let activeLines = [];
-
+let mainSoundtrack;
 
 socket = io.connect(location.origin);
 // socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
@@ -24,7 +24,7 @@ function setup() {
     mic = new p5.AudioIn();
 
     background(255);
-
+    mainSoundtrack = loadSound('./Resources/Soundtracks/A-Softer-war.mp3');
 }
 
 function draw() {
@@ -50,13 +50,21 @@ function draw() {
 }
 
 function drawPlayers(num){
+
     for(let i=0; i<num; i++){
-        h = map(players[i].volume*100, 0, 1, 200, 0);
+        h = abs(map(players[i].volume*10, 0, 2, 1, 200));
         ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
-        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
-        activeLines[i].draw();
+        // activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
+        // activeLines[i].draw();
         noStroke();
-        text(players[i].id + " volume: " + players[i].volume, 10, (1+i)*15);
+        text(players[i].id + " volume: " + players[i].volume.toString() + " - h: " + h.toString(), 10, (1+i)*15);
+
+        mainSoundtrack.setVolume(players[i].volume);
+    }
+
+    for(let i=0; i<num; i++){
+        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
+        activeLines[i].draw();        
     }
 
     // if(players.length > 0){
@@ -81,7 +89,7 @@ function touchStarted() {
         mic.start();
 
         // Enable direct feedback of the sound .connect() (to the computer speakers)
-        mic.connect();
+        //mic.connect();
 
         // Enable the audio context in the browser
         getAudioContext().resume();
@@ -99,10 +107,14 @@ function mousePressed(){
         mic.start();
 
         // Enable direct feedback of the sound .connect() (to the computer speakers)
-        mic.connect();
+        //mic.connect();
 
         // Enable the audio context in the browser
         getAudioContext().resume();
+    }
+
+    if(!mainSoundtrack.isPlaying()){
+        mainSoundtrack.play();
     }
 }
 
