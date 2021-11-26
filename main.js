@@ -19,6 +19,7 @@ const server = app.listen(process.env.PORT || SERVER_PORT, () => {
 
 app.use(express.static(__dirname + '/public/resources'));
 app.use(express.static(__dirname + '/public/Orchestra'));
+app.use('/Soundtracks', express.static(__dirname + '/public/Orchestra/Resources/Soundtracks'));
 app.get('/Orchestra', (req, res) => {    
     console.log('GET /');
     
