@@ -16,6 +16,10 @@ socket.on("connect", () => {
     console.log(socket.id + " connected: " + socket.connected); // true
 });
 
+function preload(){
+
+    mainSoundtrack = loadSound('./Resources/Soundtracks/A-Softer-war.mp3');
+}
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -24,7 +28,6 @@ function setup() {
     mic = new p5.AudioIn();
 
     background(255);
-    mainSoundtrack = loadSound('./Resources/Soundtracks/A-Softer-war.mp3');
 }
 
 function draw() {
