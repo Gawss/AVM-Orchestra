@@ -6,10 +6,17 @@ let socket;
 
 let players = [];
 let activeLines = [];
-let mainSoundtrack;
+let mainSoundtracks = [];
+const soundtracksPath = './Resources/Soundtracks/';
+const soundtracksName = [
+    'A-Softer-war.mp3',
+    'MusicBox.mp3'
+];
 
 let fft;
 let spectrum;
+
+let port;
 
 socket = io.connect(location.origin);
 // socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
@@ -21,19 +28,40 @@ socket.on("connect", () => {
 
 function preload(){
 
-    mainSoundtrack = loadSound('./Resources/Soundtracks/A-Softer-war.mp3');
+    for(let i =0; i < soundtracksName.length; i++){
+        mainSoundtracks[i] = loadSound(soundtracksPath + soundtracksName[i]);
+        mainSoundtracks[i].setVolume(0);
+    }
+
 }
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-
+    
     // Create an Audio input
     getAudioContext().suspend();
     mic = new p5.AudioIn();
-
+    
     fft = new p5.FFT();
-
+    
     background(255);
+    // if ("serial" in navigator) {
+    //     // The Web Serial API is supported.
+    //     console.log("serial is supported.");
+    //     // Prompt user to select any serial port.
+    //     port = await navigator.serial.requestPort();
+
+    //     // Wait for the serial port to open.
+    //     await port.open({ baudRate: 9600 });
+
+    //     const textEncoder = new TextEncoderStream();
+    //     const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+        
+    //     const writer = textEncoder.writable.getWriter();
+        
+    //     await writer.write('q');
+    // }
+
 }
 
 function draw() {
@@ -81,7 +109,7 @@ function drawPlayers(num){
         noStroke();
         text(players[i].id + " volume: " + players[i].volume.toString() + " - h: " + h.toString(), 10, (1+i)*15);
 
-        mainSoundtrack.setVolume(players[i].volume);
+        mainSoundtracks[i].setVolume(players[i].volume);
     }
 
     for(let i=0; i<num; i++){
@@ -137,10 +165,45 @@ function mousePressed(){
         getAudioContext().resume();
     }
 
-    if(!mainSoundtrack.isPlaying()){
-        mainSoundtrack.play();
-    }
+    mainSoundtracks.forEach(soundtrack => {
+        if(!soundtrack.isPlaying()){
+            soundtrack.loop();
+        }        
+    });
+
+    // let ports = await navigator.serial.getPorts();
+    // if(port == null){
+    //     AskPorts();
+    // }
 }
+
+async function AskPorts(){
+    console.log("Asking ports...");
+    port = await navigator.serial.requestPort();
+    console.log(port);
+    // if(port){
+    //     OpenPort(port);
+    // }
+
+    // port = await navigator.serial.requestPort();
+    // - Wait for the port to open.
+    await port.open({ baudRate: 9600 });
+}
+
+async function OpenPort(serialport){
+    await serialport.open({baudRate: 9600});
+}
+
+navigator.serial.addEventListener('connect', e => {
+    // Add |e.port| to the UI or automatically connect.
+    console.log("Port: " + e.port + " has been connected.");
+});
+  
+navigator.serial.addEventListener('disconnect', e => {
+    // Remove |e.port| from the UI. If the device was open the
+    // disconnection can also be observed as a stream error.
+    console.log("Port: " + e.port + " has been disconnected.");
+});
 
 socket.on('mouse', data => {
     console.log(data);
