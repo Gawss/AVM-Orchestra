@@ -5,14 +5,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AVM Orchestra</title>
+    <link href="./Resources/styles/styles.css" rel="stylesheet">
     <script type="text/javascript" src="socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
-    <script src="p5.serialport.js"></script>
-    <script src="p5.sound.js"></script>
+    <script src="https://github.com/processing/p5.js-sound/releases/download/v1.0.1/p5.sound.js"></script>
+    <script src="globalData.js"></script>
     <script src="sketch.js"></script>
     <style>*{margin: 0; padding: 0;} canvas{display:block;} body{margin:0;}</style>
 </head>
 <body>
-    
+    <button id="serialBtn" >Open Ports</button>
+    <input id="msgLabel">
+    <button id="sendBtn" disabled="true">Send</button>
+    <label class="switch">
+        <input id="serialToggle" type="checkbox">
+        <span class="slider round"></span>
+    </label>
 </body>
+<script src="./webAPI.serial.js"></script>
 </html>

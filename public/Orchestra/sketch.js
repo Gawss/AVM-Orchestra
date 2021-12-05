@@ -1,8 +1,12 @@
 let mic;
 let hasStarted = false;
 let h = 50;
+let localVolume = 0;
+let previousVolume = 0;
 
 let socket;
+let socketTimeInterval = 200;
+let isStreaming = false;
 
 let players = [];
 let activeLines = [];
@@ -13,10 +17,9 @@ const soundtracksName = [
     'MusicBox.mp3'
 ];
 
+
 let fft;
 let spectrum;
-
-let port;
 
 socket = io.connect(location.origin);
 // socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
@@ -24,6 +27,7 @@ socket = io.connect(location.origin);
 
 socket.on("connect", () => {
     console.log(socket.id + " connected: " + socket.connected); // true
+
 });
 
 function preload(){
@@ -45,23 +49,9 @@ function setup() {
     fft = new p5.FFT();
     
     background(255);
-    // if ("serial" in navigator) {
-    //     // The Web Serial API is supported.
-    //     console.log("serial is supported.");
-    //     // Prompt user to select any serial port.
-    //     port = await navigator.serial.requestPort();
+    if ("serial" in navigator) {
 
-    //     // Wait for the serial port to open.
-    //     await port.open({ baudRate: 9600 });
-
-    //     const textEncoder = new TextEncoderStream();
-    //     const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-        
-    //     const writer = textEncoder.writable.getWriter();
-        
-    //     await writer.write('q');
-    // }
-
+    }
 }
 
 function draw() {
@@ -72,20 +62,32 @@ function draw() {
 
     if(getAudioContext().state === 'running'){
         // Get the overall volume (between 0 and 1.0)
-        let vol = mic.getLevel();
+        localVolume = mic.getLevel();
         // stroke(0);
     
         // Draw an ellipse with height based on volume
         // h = map(vol*100, 0, 1, 200, 0);
         // text(vol*100, 10, 10);
         // text("Current Players: " + players.length, 10, 50);
-
-        if(socket.connected){
-            SendInput(vol);
+        
+        if(!isStreaming){
+            // Start streaming inputdata
+            if(socket.connected){
+                console.log("Start streaming inputdata");
+                SendInput();
+                isStreaming = true;
+            }
         }
     }
 
     drawSpectrum();
+    if(GlobalData.serialActive){
+        text(SensorsData[0], windowWidth-100, 20);
+        text(SensorsData[1], windowWidth-100, 40);
+        text(SensorsData[2], windowWidth-100, 60);
+    }else{
+        text(Log.inactiveMsg, windowWidth-150, 20);
+    }
 }
 
 function drawSpectrum(){
@@ -170,40 +172,7 @@ function mousePressed(){
             soundtrack.loop();
         }        
     });
-
-    // let ports = await navigator.serial.getPorts();
-    // if(port == null){
-    //     AskPorts();
-    // }
 }
-
-async function AskPorts(){
-    console.log("Asking ports...");
-    port = await navigator.serial.requestPort();
-    console.log(port);
-    // if(port){
-    //     OpenPort(port);
-    // }
-
-    // port = await navigator.serial.requestPort();
-    // - Wait for the port to open.
-    await port.open({ baudRate: 9600 });
-}
-
-async function OpenPort(serialport){
-    await serialport.open({baudRate: 9600});
-}
-
-navigator.serial.addEventListener('connect', e => {
-    // Add |e.port| to the UI or automatically connect.
-    console.log("Port: " + e.port + " has been connected.");
-});
-  
-navigator.serial.addEventListener('disconnect', e => {
-    // Remove |e.port| from the UI. If the device was open the
-    // disconnection can also be observed as a stream error.
-    console.log("Port: " + e.port + " has been disconnected.");
-});
 
 socket.on('mouse', data => {
     console.log(data);
@@ -236,17 +205,23 @@ socket.on('playerDisconnected', data => {
 
 })
 
-function SendInput(volume){
+function SendInput(){
 
+    // console.log("Getting player...");
     if(GetPlayer(socket.id) != null){
-        GetPlayer(socket.id).volume = volume;
+        GetPlayer(socket.id).volume = localVolume;
     }
     
+    // console.log("Creating package");
     var data = {
-        volume: volume,
+        volume: localVolume,
         playerID: socket.id
     }
+
+    // console.log(data);
     socket.emit('microphone', data);
+
+    setTimeout(SendInput, socketTimeInterval);
 }
 
 function sendmouse(x, y) {
@@ -329,4 +304,4 @@ class sinWave{
         this.positions.x1 = this.positions.x2;
         this.positions.y1 = this.positions.y2;
     }
-  }
+}
