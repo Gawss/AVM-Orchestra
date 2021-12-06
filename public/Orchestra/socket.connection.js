@@ -61,7 +61,6 @@ function SendInput(){
         soundtrackIndex: soundtrackSelector.selectedIndex
     }
 
-    console.log(data);
     socket.emit('microphone', data);
 
     setTimeout(SendInput, socketSettings.timeInterval);

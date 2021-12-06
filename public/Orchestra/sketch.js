@@ -6,7 +6,7 @@ let mainSoundtracks = [];
 
 let fft;
 let spectrum;
-
+let soundtrackReview = false;
 
 function preload(){
 
@@ -34,7 +34,8 @@ function setup() {
         SocketSetup();
     }
 
-    setupBrownianMotion();
+    // setupBrownianMotion();
+    SetupEllipseConvergence();
 }
 
 function windowResized() {
@@ -64,7 +65,7 @@ function draw() {
         }
     }
 
-    // drawSpectrum();
+    drawSpectrum();
     drawLocalInfo();
 }
 
@@ -75,7 +76,7 @@ function drawPlayers(num){
         noFill();
         stroke(availableColors[i].r, availableColors[i].g, availableColors[i].b);
 
-        ellipse(windowWidth/2, (windowHeight/2)-(50*2), players[i].volume*100*(1+i), players[i].volume*100*(1+i));
+        ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, players[i].volume*100*(1+i), players[i].volume*100*(1+i));
         noStroke();
         fill(255);
         text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
@@ -91,22 +92,33 @@ function drawPlayers(num){
     }
 
     mainSoundtracks.forEach(soundtrack => {
-        if(soundtrack.isPlaying() && soundtrack.volume < 0.1){
-            soundtrack.pause();
-        }
+        soundtrackReview = false;
+        players.forEach(player => {
+            if(mainSoundtracks.indexOf(soundtrack) == player.soundtrackIndex){
+                soundtrackReview = true;
+            }
+        });
+
+        if(!soundtrackReview) soundtrack.pause();
     });
     
-    if(GetPlayer(socket.id)) drawBrownianMotion(GetPlayer(socket.id).volume*10);
+    // if(GetPlayer(socket.id)) drawBrownianMotion(GetPlayer(socket.id).volume*10);
+    // if(GetPlayer(socket.id)) drawEllipseConvergence(GetPlayer(socket.id).volume);
+    
 }
 
 function drawSpectrum(){
     spectrum = fft.analyze();
-    noStroke();
-    fill(spectrumColor);
-    for (let i = 0; i< spectrum.length; i++){
-      let x = map(i, 0, spectrum.length, 0, width);
-      let h = -height + map(spectrum[i], 0, 255, height, 0);
-      rect(x, windowHeight, width / spectrum.length, h )
+    stroke(255);
+    // fill(spectrumColor);
+    noFill();
+    for (let i = 0; i< spectrum.length; i+=10){
+      let x = map(i, 0, spectrum.length, 0, width/2);
+      let h = -(height*0.8) + map(spectrum[i], 0, 255, height*0.8, 0);
+      ellipse(x, (windowHeight-(windowHeight*0.038))/2, h, h);
+      ellipse(map(x, 0, width/2, width, width/2), (windowHeight-(windowHeight*0.038))/2, h, h);
+    //   rect(x, windowHeight, width / spectrum.length, h );
+    //   drawEllipseConvergence(h);
     }
 }
 
@@ -176,7 +188,7 @@ function mousePressed(){
 
 function InsertLine(index){
     
-    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight/(index+2))+(25*(index+2)), 
+    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight-(windowHeight*0.038))/(index+2), 
         [availableColors[index].r,
         availableColors[index].g,
         availableColors[index].b]
@@ -226,6 +238,8 @@ class sinWave{
         // stroke(100, 200, 50);
         this.lines.forEach((item)=>{
             line(this.initialX + item.value[0], item.value[1], this.initialX + item.value[2], item.value[3]);
+            line(map(this.initialX, 0, -width, width, width*2) - item.value[0], item.value[1], map(this.initialX, 0, -width, width, width*2) - item.value[2], item.value[3]);
+
             this.currentMaxPointX = max(item.value[2], this.currentMaxPointX);
         });
   
