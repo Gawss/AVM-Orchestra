@@ -82,10 +82,19 @@ function drawPlayers(num){
 
         if(mainSoundtracks[players[i].soundtrackIndex]){
             mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
+            if(!mainSoundtracks[players[i].soundtrackIndex].isPlaying()){
+                mainSoundtracks[players[i].soundtrackIndex].loop();
+            }
         }
         activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
         activeLines[i].draw();
     }
+
+    mainSoundtracks.forEach(soundtrack => {
+        if(soundtrack.isPlaying() && soundtrack.volume < 0.1){
+            soundtrack.pause();
+        }
+    });
     
     if(GetPlayer(socket.id)) drawBrownianMotion(GetPlayer(socket.id).volume*10);
 }
@@ -138,6 +147,7 @@ function touchStarted() {
     mainSoundtracks.forEach(soundtrack => {
         if(!soundtrack.isPlaying()){
             soundtrack.loop();
+            soundtrack.pause();
         }        
     });
 }
@@ -159,6 +169,7 @@ function mousePressed(){
     mainSoundtracks.forEach(soundtrack => {
         if(!soundtrack.isPlaying()){
             soundtrack.loop();
+            soundtrack.pause();
         }        
     });
 }

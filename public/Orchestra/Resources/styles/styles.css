@@ -6,6 +6,7 @@
     display: inline-block;
     width: 60px;
     height: 34px;
+    margin: 0;
   }
   
 /* Hide default HTML checkbox */
@@ -41,11 +42,11 @@
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: darkblue;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px darkblue;
 }
 
 input:checked + .slider:before {
@@ -74,22 +75,26 @@ body{margin:0;}
 
 button{
   width: 12vw;
+  height: 3vh;
 }
 
 input{
   width: 20vw;
   padding-left: 10px;
+  height: 2.7vh;
 }
 
 .mainSettings{
   display: flex;
-  background-color:goldenrod;
+  background-color:rgb(66, 195, 255);
   padding: 5px;
   height: 3vh;
 }
 
 .mainSettings div{
   display: flex;
+  height: 3vh;
+  align-items: center;
 }
 
 .mainSettings p{
@@ -107,6 +112,7 @@ input{
 
 .soundSettings select{
   width: 20vw;
+  height: 3vh;
 }
 
 @media only screen and (max-width: 600px) {
@@ -121,5 +127,11 @@ input{
 
   .soundSettings select{
     width: 60vw;
+  }
+}
+
+@media only screen and (max-width: 1921px){
+  input{
+    height: 2.55vh;
   }
 }
