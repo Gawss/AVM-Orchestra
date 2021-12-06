@@ -51,7 +51,10 @@ function draw() {
 
         if(portSettings.isActive){
             if(isFinite(SensorsData[0])) localVolume = map(SensorsData[0], 0, 1, 0, 1);
-        }else{
+        }else if(accelerometerSettings.isActive){
+            localVolume = map(accelerometerSettings.axis.y, 0, 10, 0, 1);
+        }
+        else{
             localVolume = abs(map(mic.getLevel(), 0, 1, 0, 2));
         }
         

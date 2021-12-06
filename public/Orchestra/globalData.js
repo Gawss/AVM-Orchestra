@@ -14,6 +14,11 @@ let portSettings = {
     isActive: false
 };
 
+let accelerometerSettings = {
+    isActive: false,
+    axis: {x:0, y:0, z:0}
+};
+
 let SensorsData = [0, 0, 0];
 
 let Log = {

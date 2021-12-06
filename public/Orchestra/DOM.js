@@ -11,3 +11,26 @@ function SetupSelector(){
         soundtrackSelector.appendChild(opt);
     });
 };
+
+function SetupAccelerometer(){
+    if(window.DeviceMotionEvent){
+        accelerometerSettings.isActive = true;
+        window.addEventListener("devicemotion", motion, false);
+    }else{
+        accelerometerSettings.isActive = false;
+        console.log("DeviceMotionEvent is not supported");
+    }
+}
+
+
+function motion(event){
+    // console.log("Accelerometer: "
+    //   + event.accelerationIncludingGravity.x + ", "
+    //   + event.accelerationIncludingGravity.y + ", "
+    //   + event.accelerationIncludingGravity.z
+    // );
+
+    accelerometerSettings.axis.x = parseInt(event.accelerationIncludingGravity.x);
+    accelerometerSettings.axis.y = parseInt(event.accelerationIncludingGravity.y);
+    accelerometerSettings.axis.z = parseInt(event.accelerationIncludingGravity.z);
+}
