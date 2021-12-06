@@ -9,6 +9,7 @@ let spectrum;
 let soundtrackReview = false;
 
 let qrcodeIMG;
+let fpsFlag = false;
 
 function preload(){
 
@@ -71,7 +72,13 @@ function draw() {
         }
     }
 
-    drawSpectrum();
+    if(!fpsFlag){
+        if(frameRate() < 15 && frameRate > 0){
+            fpsFlag = true;
+        }
+        drawSpectrum();
+    }
+
     drawLocalInfo();
 }
 
@@ -134,13 +141,19 @@ function drawLocalInfo(){
     noStroke();
     textAlign(RIGHT);
     if(portSettings.isActive){
-        text(SensorsData[0], windowWidth-100, height-40);
-        text(SensorsData[1], windowWidth-100, height-60);
-        text(SensorsData[2], windowWidth-100, height-80);
+        text(SensorsData[0], windowWidth-100, height-60);
+        text(SensorsData[1], windowWidth-100, height-80);
+        text(SensorsData[2], windowWidth-100, height-100);
     }else{
-        text(Log.inactiveMsg, windowWidth-100, height-40);
+        text(Log.inactiveMsg, windowWidth-100, height-60);
     }
-    text("FPS: " + parseInt(frameRate()), windowWidth-100, height-20);
+
+    if(accelerometerSettings.isActive){
+        text(Log.accelerometerMsg + accelerometerSettings.axis.y.toString(), windowWidth-100, height-80);
+    }
+
+    text("FPS: " + parseInt(frameRate()), windowWidth-100, height-40);
+    if(fpsFlag) text("LOW FRAME RATE. Some visuals have been disabled.", windowWidth-100, height-20);
     // if(soundtrackSelector){
     //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     // }

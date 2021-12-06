@@ -16,10 +16,10 @@ function SetupAccelerometer(){
     console.log("setup accelerometer");
     if(window.DeviceMotionEvent){
         console.log("DeviceMotionEvent is supported");
-        // accelerometerSettings.isActive = true;
+        accelerometerSettings.isActive = true;
         window.addEventListener("devicemotion", motion, false);
     }else{
-        // accelerometerSettings.isActive = false;
+        accelerometerSettings.isActive = false;
         console.log("DeviceMotionEvent is not supported");
     }
 }

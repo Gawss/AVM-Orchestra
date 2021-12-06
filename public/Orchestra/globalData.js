@@ -23,6 +23,7 @@ let SensorsData = [0, 0, 0];
 
 let Log = {
     inactiveMsg: "SerialPort Inactive",
+    accelerometerMsg: "Accelerometer is Active",
     startMsg: "CLICK OR TAP TO START!",
     joinMsg: "SCAN THE QR CODE TO JOIN"
 };
