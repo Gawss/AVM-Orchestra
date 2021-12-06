@@ -11,7 +11,7 @@ let sendBtn = document.getElementById("sendBtn");
 let serialToggle = document.getElementById("serialToggle");
 
 serialToggle.addEventListener('click', () => {
-    console.log("toggle new value: " + serialToggle.checked);
+    //console.log("toggle new value: " + serialToggle.checked);
     portSettings.isActive = serialToggle.checked;
     if(!portSettings.isActive){
         DeactivateCOM();
@@ -25,7 +25,6 @@ serialBtn.addEventListener('click', () =>{
             console.log("Serial Port has been opened.");
             sendBtn.disabled = false;
             currentPort = port;
-            GlobalData.serialActive = true;
             SetUpWriter();
             ReadPort();
 
@@ -39,7 +38,7 @@ serialBtn.addEventListener('click', () =>{
 
 sendBtn.addEventListener('click', () =>{
     console.log("About to send: " + msgLabel.value);
-    RecursiveCOM();
+    SendDataCOM();
 });
 
 navigator.serial.addEventListener('connect', (e) => {
@@ -76,7 +75,7 @@ async function ReadPort(){
             console.log(error);
         }finally{
             reader.releaseLock();
-            GlobalData.serialActive = false;
+            DeactivateCOM();
         }
     }
 }
@@ -85,11 +84,10 @@ function SetUpWriter(){
     textEncoder = new TextEncoderStream();
     writableStreamClosed = textEncoder.readable.pipeTo(currentPort.writable);
     writer = textEncoder.writable.getWriter();
-    portSettings.isActive = true;
 }
 
-function RecursiveCOM(){ 
-    if(currentPort.writable && portSettings.isActive){
+function SendDataCOM(){ 
+    if(currentPort.writable){
         (async() => {
             await writer.write(msgLabel.value);
         })();
@@ -100,6 +98,7 @@ function DeactivateCOM(){
     if(currentPort.writable){
         (async() => {
             await writer.write(GlobalData.deactivateCommand);
+            portSettings.isActive = false;
         })();
     }
 }
@@ -108,12 +107,14 @@ function LineBreakTransformer(fullPackage){
     var fullLine = "";
     for(let i = 0; i < fullPackage.length; i++){
         if(fullPackage[i] == 13){
-            console.log("carriage return");
+            //console.log("carriage return");
             continue;
         }else if(fullPackage[i] == 10){
-            console.log("new line");
+            //console.log("new line");
             if(portSettings.isActive){
-                setTimeout(()=>{RecursiveCOM();}, portSettings.timeout);
+                setTimeout(()=>{SendDataCOM();}, portSettings.timeout);
+            }else{
+                DeactivateCOM();
             }
             break;
         }
@@ -121,10 +122,14 @@ function LineBreakTransformer(fullPackage){
     }
 
     var splittedLine = fullLine.split(',');
-    if(splittedLine.length == GlobalData.packageSize){
-        SensorsData[0] = splittedLine[0];
-        SensorsData[1] = splittedLine[1];
-        SensorsData[2] = splittedLine[2];
+    if(splittedLine.length === GlobalData.packageSize){
+        //console.log("PACKAGE IS CORRECT");
+        SensorsData[0] = parseFloat(isNaN(splittedLine[0])? 0: splittedLine[0]);
+        SensorsData[1] = parseFloat(isNaN(splittedLine[1])? 0: splittedLine[1]);
+        SensorsData[2] = parseFloat(isNaN(splittedLine[2])? 0: splittedLine[2]);
+    }else{
+        //console.log("PACKAGE INCORRECT");
+        return;
     }
-    // console.log(fullLine, fullLine.length, splittedLine.length);
+    //console.log(fullLine, fullLine.length, splittedLine.length);
 }

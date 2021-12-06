@@ -53,12 +53,6 @@ io.sockets.on('connection', (socket) => {
 
     io.emit('players', _data);
 
-    socket.on('mouse', (data) => {
-        socket.broadcast.emit('mouse', data);
-        // io.emit('mouse', data);
-        console.log(data);
-    })
-
     socket.on('microphone', (data) => {
         socket.broadcast.emit('microphone', data);
     })

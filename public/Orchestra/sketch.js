@@ -1,34 +1,13 @@
 let mic;
 let hasStarted = false;
 let h = 50;
-let localVolume = 0;
-let previousVolume = 0;
 
-let socket;
-let socketTimeInterval = 200;
-let isStreaming = false;
-
-let players = [];
 let activeLines = [];
 let mainSoundtracks = [];
-const soundtracksPath = './Resources/Soundtracks/';
-const soundtracksName = [
-    'A-Softer-war.mp3',
-    'MusicBox.mp3'
-];
-
 
 let fft;
 let spectrum;
 
-socket = io.connect(location.origin);
-// socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
-// socket = io.connect('http://localhost:1337')
-
-socket.on("connect", () => {
-    console.log(socket.id + " connected: " + socket.connected); // true
-
-});
 
 function preload(){
 
@@ -40,7 +19,7 @@ function preload(){
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth, windowHeight-(windowHeight*0.038));
     
     // Create an Audio input
     getAudioContext().suspend();
@@ -49,20 +28,28 @@ function setup() {
     fft = new p5.FFT();
     
     background(255);
-    if ("serial" in navigator) {
+    // if ("serial" in navigator) {
 
+    // }
+    if(socket === 0){
+        SocketSetup();
     }
 }
 
 function draw() {
-    background(255);
+    background(0);
     fill(0);
 
     drawPlayers(players.length);
 
     if(getAudioContext().state === 'running'){
         // Get the overall volume (between 0 and 1.0)
-        localVolume = mic.getLevel();
+
+        if(portSettings.isActive){
+            if(isFinite(SensorsData[0])) localVolume = map(SensorsData[0], 0, 1, 0, 1);
+        }else{
+            localVolume = abs(map(mic.getLevel(), 0, 1, 0, 2));
+        }
         // stroke(0);
     
         // Draw an ellipse with height based on volume
@@ -70,23 +57,29 @@ function draw() {
         // text(vol*100, 10, 10);
         // text("Current Players: " + players.length, 10, 50);
         
-        if(!isStreaming){
+        if(!socketSettings.isStreaming){
             // Start streaming inputdata
             if(socket.connected){
                 console.log("Start streaming inputdata");
                 SendInput();
-                isStreaming = true;
+                socketSettings.isStreaming = true;
             }
         }
     }
 
     drawSpectrum();
-    if(GlobalData.serialActive){
+
+    fill(255);
+    if(portSettings.isActive){
         text(SensorsData[0], windowWidth-100, 20);
         text(SensorsData[1], windowWidth-100, 40);
         text(SensorsData[2], windowWidth-100, 60);
     }else{
         text(Log.inactiveMsg, windowWidth-150, 20);
+    }
+
+    if(soundtrackSelector){
+        text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     }
 }
 
@@ -97,21 +90,29 @@ function drawSpectrum(){
     for (let i = 0; i< spectrum.length; i++){
       let x = map(i, 0, spectrum.length, 0, width);
       let h = -height + map(spectrum[i], 0, 255, height, 0);
-      rect(x, height, width / spectrum.length, h )
+      rect(x, windowHeight, width / spectrum.length, h )
     }
 }
 
 function drawPlayers(num){
 
     for(let i=0; i<num; i++){
-        h = abs(map(players[i].volume*10, 0, 2, 1, 200));
+        h = players[i].volume;
         ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
         // activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
         // activeLines[i].draw();
         noStroke();
+        fill(255);
         text(players[i].id + " volume: " + players[i].volume.toString() + " - h: " + h.toString(), 10, (1+i)*15);
 
-        mainSoundtracks[i].setVolume(players[i].volume);
+        console.log(players);
+        if(mainSoundtracks[players[i].soundtrackIndex]){
+            console.log("PLAYING AT VOLUME", players[i].soundtrackIndex, soundtrackSelector.selectedIndex);
+            mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
+        }else{
+            console.log(players);
+            // console.log("NOT PLAYING AT VOLUME", players[i].soundtrackIndex, soundtrackSelector.selectedIndex);
+        }
     }
 
     for(let i=0; i<num; i++){
@@ -136,32 +137,10 @@ function touchStarted() {
 
     if (getAudioContext().state !== 'running') {
         
-        // start the Audio Input.
-        // By default, it does not .connect() (to the computer speakers)
-        mic.start();
-
-        // Enable direct feedback of the sound .connect() (to the computer speakers)
-        //mic.connect();
-
-        // Enable the audio context in the browser
-        getAudioContext().resume();
-    }
-}
-
-function mousePressed(){
-    console.log("mousePressed");
-    // sendmouse(mouseX, mouseY);
-
-    if (getAudioContext().state !== 'running') {
-
         userStartAudio();
-        
         // start the Audio Input.
         // By default, it does not .connect() (to the computer speakers)
         mic.start();
-
-        // Enable direct feedback of the sound .connect() (to the computer speakers)
-        //mic.connect();
 
         // Enable the audio context in the browser
         getAudioContext().resume();
@@ -174,79 +153,33 @@ function mousePressed(){
     });
 }
 
-socket.on('mouse', data => {
-    console.log(data);
-})
+function mousePressed(){
 
-socket.on('microphone', data => {
+    if (getAudioContext().state !== 'running') {
 
-    GetPlayer(data.playerID).volume = data.volume;
-})
+        userStartAudio();
+        
+        // start the Audio Input.
+        // By default, it does not .connect() (to the computer speakers)
+        mic.start();
 
-socket.on('players', data => {
-
-    console.log('player has connected: ' + data.players[data.players.length-1].id);
-    players = data.players;
-
-    while(players.length > activeLines.length){
-        InsertLine(activeLines.length +1);
-    }
-})
-
-socket.on('playerDisconnected', data => {
-    
-    console.log('player has disconnected: ' + data.disconnected);
-
-    players = data.players;
-
-    if(activeLines[players.indexOf(GetPlayer(data.disconnected))] != null){
-        activeLines.splice(players.indexOf(GetPlayer(data.disconnected)), 1);
+        // Enable the audio context in the browser
+        getAudioContext().resume();
     }
 
-})
-
-function SendInput(){
-
-    // console.log("Getting player...");
-    if(GetPlayer(socket.id) != null){
-        GetPlayer(socket.id).volume = localVolume;
-    }
-    
-    // console.log("Creating package");
-    var data = {
-        volume: localVolume,
-        playerID: socket.id
-    }
-
-    // console.log(data);
-    socket.emit('microphone', data);
-
-    setTimeout(SendInput, socketTimeInterval);
-}
-
-function sendmouse(x, y) {
-    const data = {
-     x: x,
-     y: y
-    }
-    socket.emit('mouse', data)
-}
-
-function GetPlayer(id){
-    for(let i= 0;i < players.length; i++){
-        if(players[i].id == id){
-            return players[i]
-        }
-    }
-
-    return null;
+    mainSoundtracks.forEach(soundtrack => {
+        if(!soundtrack.isPlaying()){
+            soundtrack.loop();
+        }        
+    });
 }
 
 function InsertLine(index){
-    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight/(index+1))+(25*(index)), 
-        [random(255),
-        random(255),
-        random(255)]
+    
+    activeLines.push(new sinWave(windowWidth/2, 1, (windowHeight/(index+2))+(25*(index+2)), 
+        [availableColors[index].r,
+        availableColors[index].g,
+        availableColors[index].b]
     ));
     activeLines[activeLines.length - 1].setup();
 }
