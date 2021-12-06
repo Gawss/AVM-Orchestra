@@ -5,7 +5,7 @@ var GlobalData = {
 };
 
 let socketSettings = {
-    timeInterval: 200,
+    timeInterval: 50,
     isStreaming: false
 };
 
@@ -17,7 +17,8 @@ let portSettings = {
 let SensorsData = [0, 0, 0];
 
 let Log = {
-    inactiveMsg: "SerialPort Inactive."
+    inactiveMsg: "SerialPort Inactive.",
+    startMsg: "Click or Tap to start!"
 };
 
 const soundtracksPath = './Resources/Soundtracks/';
@@ -31,6 +32,8 @@ const availableColors = [
     {r: 0, g:255, b:0},
     {r: 55, g:200, b:100}
 ];
+
+const spectrumColor = [255, 255, 255];
 
 let players = [];
 

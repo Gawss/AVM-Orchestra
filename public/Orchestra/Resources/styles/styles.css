@@ -108,3 +108,18 @@ input{
 .soundSettings select{
   width: 20vw;
 }
+
+@media only screen and (max-width: 600px) {
+  .serialSettings{
+    visibility: hidden;
+    width: 0;
+  }
+
+  .soundSettings{
+    width: 100vw;
+  }
+
+  .soundSettings select{
+    width: 60vw;
+  }
+}

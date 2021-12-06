@@ -1,6 +1,5 @@
 let mic;
 let hasStarted = false;
-let h = 50;
 
 let activeLines = [];
 let mainSoundtracks = [];
@@ -34,28 +33,26 @@ function setup() {
     if(socket === 0){
         SocketSetup();
     }
+
+    setupBrownianMotion();
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight-(windowHeight*0.038));
 }
 
 function draw() {
     background(0);
-    fill(0);
 
     drawPlayers(players.length);
 
     if(getAudioContext().state === 'running'){
-        // Get the overall volume (between 0 and 1.0)
 
         if(portSettings.isActive){
             if(isFinite(SensorsData[0])) localVolume = map(SensorsData[0], 0, 1, 0, 1);
         }else{
             localVolume = abs(map(mic.getLevel(), 0, 1, 0, 2));
         }
-        // stroke(0);
-    
-        // Draw an ellipse with height based on volume
-        // h = map(vol*100, 0, 1, 200, 0);
-        // text(vol*100, 10, 10);
-        // text("Current Players: " + players.length, 10, 50);
         
         if(!socketSettings.isStreaming){
             // Start streaming inputdata
@@ -67,26 +64,36 @@ function draw() {
         }
     }
 
-    drawSpectrum();
+    // drawSpectrum();
+    drawLocalInfo();
+}
 
-    fill(255);
-    if(portSettings.isActive){
-        text(SensorsData[0], windowWidth-100, 20);
-        text(SensorsData[1], windowWidth-100, 40);
-        text(SensorsData[2], windowWidth-100, 60);
-    }else{
-        text(Log.inactiveMsg, windowWidth-150, 20);
-    }
+function drawPlayers(num){
 
-    if(soundtrackSelector){
-        text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
+    for(let i=0; i<num; i++){
+        
+        noFill();
+        stroke(availableColors[i].r, availableColors[i].g, availableColors[i].b);
+
+        ellipse(windowWidth/2, (windowHeight/2)-(50*2), players[i].volume*100*(1+i), players[i].volume*100*(1+i));
+        noStroke();
+        fill(255);
+        text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
+
+        if(mainSoundtracks[players[i].soundtrackIndex]){
+            mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
+        }
+        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
+        activeLines[i].draw();
     }
+    
+    if(GetPlayer(socket.id)) drawBrownianMotion(GetPlayer(socket.id).volume*10);
 }
 
 function drawSpectrum(){
     spectrum = fft.analyze();
     noStroke();
-    fill(255, 0, 255);
+    fill(spectrumColor);
     for (let i = 0; i< spectrum.length; i++){
       let x = map(i, 0, spectrum.length, 0, width);
       let h = -height + map(spectrum[i], 0, 255, height, 0);
@@ -94,43 +101,25 @@ function drawSpectrum(){
     }
 }
 
-function drawPlayers(num){
+function drawLocalInfo(){
+    fill(255);
+    noStroke();
 
-    for(let i=0; i<num; i++){
-        h = players[i].volume;
-        ellipse((1+i)*(windowWidth /(num + 1)), windowHeight/2, h, h);
-        // activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
-        // activeLines[i].draw();
-        noStroke();
-        fill(255);
-        text(players[i].id + " volume: " + players[i].volume.toString() + " - h: " + h.toString(), 10, (1+i)*15);
-
-        console.log(players);
-        if(mainSoundtracks[players[i].soundtrackIndex]){
-            console.log("PLAYING AT VOLUME", players[i].soundtrackIndex, soundtrackSelector.selectedIndex);
-            mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
-        }else{
-            console.log(players);
-            // console.log("NOT PLAYING AT VOLUME", players[i].soundtrackIndex, soundtrackSelector.selectedIndex);
-        }
+    if(portSettings.isActive){
+        text(SensorsData[0], windowWidth-100, height-40);
+        text(SensorsData[1], windowWidth-100, height-60);
+        text(SensorsData[2], windowWidth-100, height-80);
+    }else{
+        text(Log.inactiveMsg, windowWidth-150, height-40);
     }
-
-    for(let i=0; i<num; i++){
-        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
-        activeLines[i].draw();        
-    }
-
-    // if(players.length > 0){
-    //     players.forEach((item) => {
-    //         h = map(item.volume*100, 0, 1, 200, 0);
-    //         ellipse((1+players.indexOf(item))*(windowWidth /(num + 1)), windowHeight/2, h, h);
-    //     });
+    text("FPS: " + parseInt(frameRate()), windowWidth-100, height-20);
+    // if(soundtrackSelector){
+    //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     // }
 
-    // if(activeLines.length > 0){
-    //     activeLines.forEach((item) => {item.update(map(mouseY, 0, windowHeight, -1, 1))}); //sin(frameCount / 10)
-    //     activeLines.forEach((item) => {item.draw()});
-    // }
+    if(getAudioContext().state !== 'running'){
+        text(Log.startMsg, windowWidth/2, height/2);
+    }
 }
 
 function touchStarted() {
