@@ -154,7 +154,7 @@ function drawLocalInfo(){
     }
 
     text("FPS: " + parseInt(frameRate()), Log.Settings.position.x, height-40);
-    if(fpsFlag) text("LOW FRAME RATE. Some visuals have been disabled.", Log.Settings.position.x, height-20);
+    if(fpsFlag) text(Log.fpsWarning, Log.Settings.position.x, height-20);
     // if(soundtrackSelector){
     //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     // }
@@ -213,6 +213,8 @@ function mousePressed(){
             soundtrack.pause();
         }        
     });
+
+    if(fpsFlag) fpsFlag = false;
 }
 
 function InsertLine(index){

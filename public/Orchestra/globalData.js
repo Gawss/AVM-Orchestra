@@ -26,7 +26,8 @@ let Log = {
     inactiveMsg: "SerialPort Inactive",
     accelerometerMsg: "Accelerometer is Active",
     startMsg: "CLICK OR TAP TO START!",
-    joinMsg: "SCAN THE QR CODE TO JOIN"
+    joinMsg: "SCAN THE QR CODE TO JOIN",
+    fpsWarning: "LOW FRAME RATE. Some visuals have been disabled - Tap to reset"
 };
 
 const soundtracksPath = './Resources/Soundtracks/';
