@@ -24,6 +24,7 @@ function preload(){
 
 function setup() {
     createCanvas(windowWidth, windowHeight-(windowHeight*0.038));
+    Log.Settings.position.x = windowWidth-(windowWidth*0.01);
     
     // Create an Audio input
     getAudioContext().suspend();
@@ -73,7 +74,7 @@ function draw() {
     }
 
     if(!fpsFlag){
-        if(frameRate() < 15 && frameRate > 0){
+        if(frameRate() < 15 && frameRate() > 0){
             fpsFlag = true;
         }
         drawSpectrum();
@@ -141,19 +142,19 @@ function drawLocalInfo(){
     noStroke();
     textAlign(RIGHT);
     if(portSettings.isActive){
-        text(SensorsData[0], windowWidth-100, height-60);
-        text(SensorsData[1], windowWidth-100, height-80);
-        text(SensorsData[2], windowWidth-100, height-100);
+        text(SensorsData[0], Log.Settings.position.x, height-60);
+        text(SensorsData[1], Log.Settings.position.x, height-80);
+        text(SensorsData[2], Log.Settings.position.x, height-100);
     }else{
-        text(Log.inactiveMsg, windowWidth-100, height-60);
+        text(Log.inactiveMsg, Log.Settings.position.x, height-60);
     }
 
     if(accelerometerSettings.isActive){
-        text(Log.accelerometerMsg + accelerometerSettings.axis.y.toString(), windowWidth-100, height-80);
+        text(Log.accelerometerMsg + ": " + accelerometerSettings.axis.y.toString(), Log.Settings.position.x, height-80);
     }
 
-    text("FPS: " + parseInt(frameRate()), windowWidth-100, height-40);
-    if(fpsFlag) text("LOW FRAME RATE. Some visuals have been disabled.", windowWidth-100, height-20);
+    text("FPS: " + parseInt(frameRate()), Log.Settings.position.x, height-40);
+    if(fpsFlag) text("LOW FRAME RATE. Some visuals have been disabled.", Log.Settings.position.x, height-20);
     // if(soundtrackSelector){
     //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     // }
