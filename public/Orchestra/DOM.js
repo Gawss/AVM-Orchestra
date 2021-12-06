@@ -1,6 +1,7 @@
 soundtrackSelector = document.getElementById("soundtrackSelector");
 
 SetupSelector();
+SetupAccelerometer();
 
 function SetupSelector(){
     soundtracksName.forEach(element => {
