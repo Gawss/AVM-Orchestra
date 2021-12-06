@@ -1,7 +1,6 @@
 soundtrackSelector = document.getElementById("soundtrackSelector");
 
 SetupSelector();
-SetupAccelerometer();
 
 function SetupSelector(){
     soundtracksName.forEach(element => {
@@ -14,11 +13,13 @@ function SetupSelector(){
 };
 
 function SetupAccelerometer(){
+    console.log("setup accelerometer");
     if(window.DeviceMotionEvent){
-        accelerometerSettings.isActive = true;
+        console.log("DeviceMotionEvent is supported");
+        // accelerometerSettings.isActive = true;
         window.addEventListener("devicemotion", motion, false);
     }else{
-        accelerometerSettings.isActive = false;
+        // accelerometerSettings.isActive = false;
         console.log("DeviceMotionEvent is not supported");
     }
 }

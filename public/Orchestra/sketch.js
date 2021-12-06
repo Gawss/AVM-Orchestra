@@ -8,12 +8,16 @@ let fft;
 let spectrum;
 let soundtrackReview = false;
 
+let qrcodeIMG;
+
 function preload(){
 
     for(let i =0; i < soundtracksName.length; i++){
         mainSoundtracks[i] = loadSound(soundtracksPath + soundtracksName[i]);
         mainSoundtracks[i].setVolume(0);
     }
+
+    qrcodeIMG = loadImage('./Resources/Images/qr-avm-orchestra.png')
 
 }
 
@@ -52,9 +56,8 @@ function draw() {
         if(portSettings.isActive){
             if(isFinite(SensorsData[0])) localVolume = map(SensorsData[0], 0, 1, 0, 1);
         }else if(accelerometerSettings.isActive){
-            localVolume = map(accelerometerSettings.axis.y, 0, 10, 0, 1);
-        }
-        else{
+            if(isFinite(accelerometerSettings.axis.y)) localVolume = map(accelerometerSettings.axis.y, 0, 10, 0, 1);
+        }else{
             localVolume = abs(map(mic.getLevel(), 0, 1, 0, 2));
         }
         
@@ -82,6 +85,7 @@ function drawPlayers(num){
         ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, players[i].volume*100*(1+i), players[i].volume*100*(1+i));
         noStroke();
         fill(255);
+        textAlign(LEFT);
         text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
 
         if(mainSoundtracks[players[i].soundtrackIndex]){
@@ -128,22 +132,26 @@ function drawSpectrum(){
 function drawLocalInfo(){
     fill(255);
     noStroke();
-
+    textAlign(RIGHT);
     if(portSettings.isActive){
         text(SensorsData[0], windowWidth-100, height-40);
         text(SensorsData[1], windowWidth-100, height-60);
         text(SensorsData[2], windowWidth-100, height-80);
     }else{
-        text(Log.inactiveMsg, windowWidth-150, height-40);
+        text(Log.inactiveMsg, windowWidth-100, height-40);
     }
     text("FPS: " + parseInt(frameRate()), windowWidth-100, height-20);
     // if(soundtrackSelector){
     //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
     // }
 
+    textAlign(CENTER);
     if(getAudioContext().state !== 'running'){
-        text(Log.startMsg, windowWidth/2, height/2);
+        text(Log.startMsg, windowWidth/2, height/3);
     }
+
+    text(Log.joinMsg, windowWidth/2, ((height/3)*2)+140);
+    image(qrcodeIMG, (windowWidth/2)-100, ((height/3)*2)-100);
 }
 
 function touchStarted() {
@@ -157,6 +165,10 @@ function touchStarted() {
 
         // Enable the audio context in the browser
         getAudioContext().resume();
+    }
+
+    if(!accelerometerSettings.isActive){
+        SetupAccelerometer();
     }
 
     mainSoundtracks.forEach(soundtrack => {

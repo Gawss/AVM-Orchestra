@@ -22,8 +22,9 @@ let accelerometerSettings = {
 let SensorsData = [0, 0, 0];
 
 let Log = {
-    inactiveMsg: "SerialPort Inactive.",
-    startMsg: "Click or Tap to start!"
+    inactiveMsg: "SerialPort Inactive",
+    startMsg: "CLICK OR TAP TO START!",
+    joinMsg: "SCAN THE QR CODE TO JOIN"
 };
 
 const soundtracksPath = './Resources/Soundtracks/';
