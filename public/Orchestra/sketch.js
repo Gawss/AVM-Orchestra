@@ -11,6 +11,8 @@ let soundtrackReview = false;
 let qrcodeIMG;
 let fpsFlag = false;
 
+// let guideline;
+
 function preload(){
 
     for(let i =0; i < soundtracksName.length; i++){
@@ -42,6 +44,8 @@ function setup() {
 
     // setupBrownianMotion();
     SetupEllipseConvergence();
+
+    // guideline = new sinWave(windowWidth/2, 1, (windowHeight-(windowHeight*0.038))/2, [100,100,100]);
 }
 
 function windowResized() {
@@ -80,6 +84,7 @@ function draw() {
         drawSpectrum();
     }
 
+    // guideline.update(map(-players[i].volume, -1, 1, -1, 1));
     drawLocalInfo();
 }
 
