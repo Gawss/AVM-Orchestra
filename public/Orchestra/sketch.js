@@ -11,8 +11,6 @@ let soundtrackReview = false;
 let qrcodeIMG;
 let fpsFlag = false;
 
-// let guideline;
-
 function preload(){
 
     for(let i =0; i < soundtracksName.length; i++){
@@ -45,7 +43,6 @@ function setup() {
     // setupBrownianMotion();
     SetupEllipseConvergence();
 
-    // guideline = new sinWave(windowWidth/2, 1, (windowHeight-(windowHeight*0.038))/2, [100,100,100]);
 }
 
 function windowResized() {
@@ -60,12 +57,22 @@ function draw() {
     if(getAudioContext().state === 'running'){
 
         if(portSettings.isActive){
-            if(isFinite(SensorsData[0])) localVolume = map(SensorsData[0], 0, 1, 0, 1);
+            if(isFinite(SensorsData[0])) nextLocalVolume = map(SensorsData[0], 0, 1, 0, 1);
         }else if(accelerometerSettings.isActive){
-            if(isFinite(accelerometerSettings.axis.y)) localVolume = map(accelerometerSettings.axis.y, 0, 10, 0, 1);
+            if(isFinite(accelerometerSettings.axis.y)) nextLocalVolume = map(abs(accelerometerSettings.axis.y), 0, 10, 0, 1);
         }else{
-            localVolume = abs(map(mic.getLevel(), 0, 1, 0, 2));
+            nextLocalVolume = map(mic.getLevel(0.5)< 0.01? 0: abs(mic.getLevel(0.5)), 0, 0.5, 0, 1);
         }
+
+        if(localVolume < nextLocalVolume){
+            localVolume += abs(localVolume-nextLocalVolume)*0.025; //Exponential
+            // localVolume += map(abs(localVolume-nextLocalVolume), 0, 1, 1, 0)*0.025; //Not working with serial
+            // localVolume += 0.01; //Linear
+        }else if(localVolume > nextLocalVolume){
+            localVolume -= abs(localVolume-nextLocalVolume)*0.1;
+        }
+
+        localVolume = min(max(localVolume, 0), 1);
         
         if(!socketSettings.isStreaming){
             // Start streaming inputdata
@@ -189,13 +196,6 @@ function touchStarted() {
     if(!accelerometerSettings.isActive){
         SetupAccelerometer();
     }
-
-    mainSoundtracks.forEach(soundtrack => {
-        if(!soundtrack.isPlaying()){
-            soundtrack.loop();
-            soundtrack.pause();
-        }        
-    });
 }
 
 function mousePressed(){
@@ -211,13 +211,6 @@ function mousePressed(){
         // Enable the audio context in the browser
         getAudioContext().resume();
     }
-
-    mainSoundtracks.forEach(soundtrack => {
-        if(!soundtrack.isPlaying()){
-            soundtrack.loop();
-            soundtrack.pause();
-        }        
-    });
 
     if(fpsFlag) fpsFlag = false;
 }
