@@ -16,19 +16,24 @@ function SetupAccelerometer(){
 
     
     console.log("setup accelerometer");
+
     if(window.DeviceMotionEvent){
         console.log("DeviceMotionEvent is supported");
-        DeviceMotionEvent.requestPermission().then(response => {
-                if (response == 'granted') {
-                    console.log("accelerometer permission granted");
-                    accelerometerSettings.isActive = true;
-                    window.addEventListener("devicemotion", motion, false);
-                }
-            });
+        accelerometerSettings.isActive = true;
+        window.addEventListener("devicemotion", motion, false);
     }else{
         accelerometerSettings.isActive = false;
         console.log("DeviceMotionEvent is not supported");
     }
+
+    // IF iPHONE:
+    DeviceMotionEvent.requestPermission().then(response => {
+            if (response == 'granted') {
+                console.log("accelerometer permission granted");
+                accelerometerSettings.isActive = true;
+                window.addEventListener("devicemotion", motion, false);
+            }
+    });
 }
 
 
