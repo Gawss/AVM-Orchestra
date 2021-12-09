@@ -37,23 +37,7 @@ const soundtracksName = [
     'Pokemon Theme.mp3',
     'Saint Seiya.mp3',
     'Somewhere Over The Rainbow.mp3',
-    'Top Gear Theme.mp3',
-    '-001.mp3',
-    '-002.mp3',
-    '-003.mp3',
-    '-004.mp3',
-    '-005.mp3',
-    '-006.mp3',
-    '-007.mp3',
-    '-008.mp3',
-    '-009.mp3',
-    '-010.mp3',
-    '-011.mp3',
-    '-012.mp3',
-    '-013.mp3',
-    '-014.mp3',
-    '-015.mp3',
-    '-016.mp3'
+    'Top Gear Theme.mp3'
 ];
 
 const availableColors = [
