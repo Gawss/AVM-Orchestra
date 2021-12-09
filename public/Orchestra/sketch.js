@@ -52,61 +52,59 @@ function windowResized() {
 function draw() {
     background(0);
 
-    drawPlayers(players.length);
-
-    if(getAudioContext().state === 'running'){
-
-        if(portSettings.isActive){
-            if(isFinite(SensorsData[0])) nextLocalVolume = map(SensorsData[0], 0, 1, 0, 1);
-        }else if(accelerometerSettings.isActive){
-            if(isFinite(accelerometerSettings.axis.y)) nextLocalVolume = map(abs(accelerometerSettings.axis.y), 0, 10, 0, 1);
-        }else{
-            nextLocalVolume = map(mic.getLevel(0.5)< 0.01? 0: abs(mic.getLevel(0.5)), 0, 0.5, 0, 1);
-        }
-
-        if(localVolume < nextLocalVolume){
-            localVolume += abs(localVolume-nextLocalVolume)*0.025; //Exponential
-            // localVolume += map(abs(localVolume-nextLocalVolume), 0, 1, 1, 0)*0.025; //Not working with serial
-            // localVolume += 0.01; //Linear
-        }else if(localVolume > nextLocalVolume){
-            localVolume -= abs(localVolume-nextLocalVolume)*0.1;
-        }
-
-        localVolume = min(max(localVolume, 0), 1);
-        
-        if(!socketSettings.isStreaming){
-            // Start streaming inputdata
-            if(socket.connected){
-                console.log("Start streaming inputdata");
-                SendInput();
-                socketSettings.isStreaming = true;
+    if(hasStarted){
+        drawPlayers(players.length);
+    
+        if(getAudioContext().state === 'running'){
+    
+            if(portSettings.isActive){
+                if(isFinite(SensorsData[0])) nextLocalVolume = map(SensorsData[0], 0, 1, 0, 1);
+            }else if(accelerometerSettings.isActive){
+                if(isFinite(accelerometerSettings.axis.y)) nextLocalVolume = map(abs(accelerometerSettings.axis.y), 0, 10, 0, 1);
+            }else{
+                nextLocalVolume = map(mic.getLevel(0.5)< 0.01? 0: abs(mic.getLevel(0.5)), 0, 0.5, 0, 1);
+            }
+    
+            if(localVolume < nextLocalVolume){
+                localVolume += abs(localVolume-nextLocalVolume)*0.025; //Exponential
+                // localVolume += map(abs(localVolume-nextLocalVolume), 0, 1, 1, 0)*0.025; //Not working with serial
+                // localVolume += 0.01; //Linear
+            }else if(localVolume > nextLocalVolume){
+                localVolume -= abs(localVolume-nextLocalVolume)*0.1;
+            }
+    
+            localVolume = min(max(localVolume, 0), 1);
+            
+            if(!socketSettings.isStreaming){
+                // Start streaming inputdata
+                if(socket.connected && !socketSettings.isStreaming){
+                    console.log("Start streaming inputdata");
+                    SendInput();
+                    socketSettings.isStreaming = true;
+                }
             }
         }
-    }
-
-    if(!fpsFlag){
-        if(frameRate() < 15 && frameRate() > 0){
-            fpsFlag = true;
+    
+        if(!fpsFlag){
+            if(frameRate() < 15 && frameRate() > 0){
+                fpsFlag = true;
+            }
+            drawSpectrum();
+        }else{
+            textAlign(CENTER);
+            text("Don't worry, you are still playing. This is just the simplified view.", windowWidth/2, (windowHeight-(windowHeight*0.038))/2);
+            text("volume: " + GetPlayer(socket.id).volume.toString(), windowWidth/2, ((windowHeight-(windowHeight*0.038))/2) + 80);
+            stroke(255);
+            line((windowWidth/2)-map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40,  (windowWidth/2)+map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40);
         }
-        drawSpectrum();
     }
 
-    // guideline.update(map(-players[i].volume, -1, 1, -1, 1));
     drawLocalInfo();
 }
 
 function drawPlayers(num){
 
     for(let i=0; i<num; i++){
-        
-        noFill();
-        stroke(availableColors[i].r, availableColors[i].g, availableColors[i].b);
-
-        ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, players[i].volume*100*(1+i), players[i].volume*100*(1+i));
-        noStroke();
-        fill(255);
-        textAlign(LEFT);
-        text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
 
         if(mainSoundtracks[players[i].soundtrackIndex]){
             mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
@@ -114,8 +112,17 @@ function drawPlayers(num){
                 mainSoundtracks[players[i].soundtrackIndex].loop();
             }
         }
-        activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
-        activeLines[i].draw();
+        
+        if(!fpsFlag){
+            noStroke();
+            fill(255);
+            textAlign(LEFT);
+            text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
+            activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
+            activeLines[i].draw();
+            noFill();
+            ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, players[i].volume*100*(1+i), players[i].volume*100*(1+i));
+        }
     }
 
     mainSoundtracks.forEach(soundtrack => {
@@ -127,17 +134,12 @@ function drawPlayers(num){
         });
 
         if(!soundtrackReview) soundtrack.pause();
-    });
-    
-    // if(GetPlayer(socket.id)) drawBrownianMotion(GetPlayer(socket.id).volume*10);
-    // if(GetPlayer(socket.id)) drawEllipseConvergence(GetPlayer(socket.id).volume);
-    
+    });    
 }
 
 function drawSpectrum(){
     spectrum = fft.analyze();
     stroke(255);
-    // fill(spectrumColor);
     noFill();
     for (let i = 0; i< spectrum.length; i+=10){
       let x = map(i, 0, spectrum.length, 0, width/2);
@@ -167,12 +169,9 @@ function drawLocalInfo(){
 
     text("FPS: " + parseInt(frameRate()), Log.Settings.position.x, height-40);
     if(fpsFlag) text(Log.fpsWarning, Log.Settings.position.x, height-20);
-    // if(soundtrackSelector){
-    //     text(soundtrackSelector.options[soundtrackSelector.selectedIndex].text, windowWidth-150, 80);
-    // }
 
     textAlign(CENTER);
-    if(getAudioContext().state !== 'running'){
+    if(!hasStarted){
         text(Log.startMsg, windowWidth/2, height/3);
     }
 
@@ -191,6 +190,8 @@ function touchStarted() {
 
         // Enable the audio context in the browser
         getAudioContext().resume();
+
+        hasStarted = true;
     }
 
     if(!accelerometerSettings.isActive){
@@ -210,6 +211,8 @@ function mousePressed(){
 
         // Enable the audio context in the browser
         getAudioContext().resume();
+
+        hasStarted = true;
     }
 
     if(fpsFlag) fpsFlag = false;
@@ -264,7 +267,7 @@ class sinWave{
     draw(){
 
         stroke(this.color.r, this.color.g, this.color.b);
-        // stroke(100, 200, 50);
+        
         this.lines.forEach((item)=>{
             line(this.initialX + item.value[0], item.value[1], this.initialX + item.value[2], item.value[3]);
             line(map(this.initialX, 0, -width, width, width*2) - item.value[0], item.value[1], map(this.initialX, 0, -width, width, width*2) - item.value[2], item.value[3]);

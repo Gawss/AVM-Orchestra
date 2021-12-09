@@ -63,7 +63,7 @@ async function ReadPort(){
         try{
             while(true){
                 const {value, done} = await reader.read();
-                console.log('value: ', value,', Done, ', done);
+                // console.log('value: ', value,', Done, ', done);
                 LineBreakTransformer(value);
 
                 if(done){

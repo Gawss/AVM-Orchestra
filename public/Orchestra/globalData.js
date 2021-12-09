@@ -5,7 +5,7 @@ var GlobalData = {
 };
 
 let socketSettings = {
-    timeInterval: 50,
+    timeInterval: 100,
     isStreaming: false
 };
 
