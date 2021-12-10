@@ -16,21 +16,13 @@ const server = app.listen(process.env.PORT || SERVER_PORT, () => {
     console.log('Server On', __dirname)
 });
 
-
+// Enable resources and specify the file to return whenever /Orchestra receives a GET request
 app.use(express.static(__dirname + '/public/resources'));
 app.use(express.static(__dirname + '/public/Orchestra'));
 app.use('/Soundtracks', express.static(__dirname + '/public/Orchestra/Resources/Soundtracks'));
 app.use('/Images', express.static(__dirname + '/public/Orchestra/Resources/Images'));
 app.get('/Orchestra', (req, res) => {    
     console.log('GET /');
-    
-    // //Load different file in localMode
-    // if(process.env.PORT != undefined){
-        //     res.sendFile(__dirname + '/public/inprogress.html');
-        // }else{
-            //     //Load different file in Online Mode
-            //     res.sendFile(__dirname + '/public/main.html');
-            // }
             
     res.sendFile(__dirname + '/public/Orchestra/main.html');
 });
