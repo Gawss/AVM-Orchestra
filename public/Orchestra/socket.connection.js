@@ -2,8 +2,9 @@ let socket = 0;
 
 function SocketSetup(){
 
-    socket = io.connect(location.origin);
-    // socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
+    // socket = io.connect(location.origin);
+    socket = io.connect('ws://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket')
+    // socket = io.connect('https://avm-orchestra.herokuapp.com/socket.io/?EIO=4&transport=websocket', { transports : ['websocket'] });
     // socket = io.connect('http://localhost:1337')
     
     socket.on("connect", () => {
