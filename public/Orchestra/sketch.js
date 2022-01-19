@@ -2,7 +2,7 @@ let mic;
 let hasStarted = false;
 
 let activeLines = [];
-let mainSoundtracks = [];
+// let mainSoundtracks = [];
 
 let fft;
 let spectrum;
@@ -13,10 +13,10 @@ let fpsFlag = false;
 
 function preload(){
 
-    for(let i =0; i < soundtracksName.length; i++){
-        mainSoundtracks[i] = loadSound(soundtracksPath + soundtracksName[i]);
-        mainSoundtracks[i].setVolume(0);
-    }
+    // for(let i =0; i < soundtracksName.length; i++){
+    //     mainSoundtracks[i] = loadSound(soundtracksPath + soundtracksName[i]);
+    //     mainSoundtracks[i].setVolume(0);
+    // }
 
     qrcodeIMG = loadImage('./Resources/Images/qr-avm-orchestra.png')
 
@@ -106,12 +106,12 @@ function drawPlayers(num){
 
     for(let i=0; i<num; i++){
 
-        if(mainSoundtracks[players[i].soundtrackIndex]){
-            mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
-            if(!mainSoundtracks[players[i].soundtrackIndex].isPlaying()){
-                mainSoundtracks[players[i].soundtrackIndex].loop();
-            }
-        }
+        // if(mainSoundtracks[players[i].soundtrackIndex]){
+        //     mainSoundtracks[players[i].soundtrackIndex].setVolume(players[i].volume);
+        //     if(!mainSoundtracks[players[i].soundtrackIndex].isPlaying()){
+        //         mainSoundtracks[players[i].soundtrackIndex].loop();
+        //     }
+        // }
         
         if(!fpsFlag){
             noStroke();
@@ -125,16 +125,16 @@ function drawPlayers(num){
         }
     }
 
-    mainSoundtracks.forEach(soundtrack => {
-        soundtrackReview = false;
-        players.forEach(player => {
-            if(mainSoundtracks.indexOf(soundtrack) == player.soundtrackIndex){
-                soundtrackReview = true;
-            }
-        });
+    // mainSoundtracks.forEach(soundtrack => {
+    //     soundtrackReview = false;
+    //     players.forEach(player => {
+    //         if(mainSoundtracks.indexOf(soundtrack) == player.soundtrackIndex){
+    //             soundtrackReview = true;
+    //         }
+    //     });
 
-        if(!soundtrackReview) soundtrack.pause();
-    });    
+    //     if(!soundtrackReview) soundtrack.pause();
+    // });    
 }
 
 function drawSpectrum(){
