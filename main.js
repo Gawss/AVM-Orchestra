@@ -10,6 +10,13 @@ let SERVER_PORT = 1337;
 let players = []
 
 app.use(express.static(__dirname + '/public'));
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+    next();
+});
 
 const server = app.listen(process.env.PORT || SERVER_PORT, () => {
     console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
@@ -17,25 +24,6 @@ const server = app.listen(process.env.PORT || SERVER_PORT, () => {
 });
 
 // Enable resources and specify the file to return whenever /Orchestra receives a GET request
-// Add headers
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:1337');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-});
 app.use(express.static(__dirname + '/public/resources'));
 app.use(express.static(__dirname + '/public/Orchestra'));
 app.use('/Soundtracks', express.static(__dirname + '/public/Orchestra/Resources/Soundtracks'));
@@ -52,7 +40,7 @@ app.get('/Calimero', (req, res) => {
     res.sendFile(__dirname + '/public/Calimero/calimero.html');
 });
         
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {origins:'https://avm-orchestra.herokuapp.com:' + process.env.PORT || SERVER_PORT});
 
 io.sockets.on('connection', (socket) => {
 
