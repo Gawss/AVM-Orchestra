@@ -21,7 +21,7 @@ const server = app.listen(process.env.PORT || SERVER_PORT, () => {
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:1337');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8888');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
