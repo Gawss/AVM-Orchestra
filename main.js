@@ -33,7 +33,13 @@ app.get('/Calimero', (req, res) => {
     res.sendFile(__dirname + '/public/Calimero/calimero.html');
 });
         
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: `http://avm-orchestra.herokuapp.com`, // I copied the origin in the error message and pasted here
+        methods: ["GET", "POST"],
+        credentials: true
+      }
+});
 
 io.sockets.on('connection', (socket) => {
 
