@@ -31,9 +31,9 @@ function SocketSetup(){
     
     socket.on('microphone', data => {
 
-        if(GetPlayer(data.playerID) !== null){
-            GetPlayer(data.playerID).volume = data.volume;
-            GetPlayer(data.playerID).soundtrackIndex = data.soundtrackIndex;
+        if(GetPlayer(data.id) !== null){
+            GetPlayer(data.id).volume = data.volume;
+            GetPlayer(data.id).soundtrackIndex = data.soundtrackIndex;
         }
 
 
@@ -65,7 +65,7 @@ function SendInput(){
     // console.log("Creating package");
     var data = {
         volume: localVolume,
-        playerID: socket.id,
+        id: socket.id,
         soundtrackIndex: soundtrackSelector.selectedIndex
     }
 

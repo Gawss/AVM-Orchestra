@@ -1,6 +1,7 @@
 const http = require('http');
 const express = require('express');
 const Player = require('./player.js').Player;
+const { type } = require('os');
 
 const app = express();
 
@@ -54,6 +55,12 @@ io.sockets.on('connection', (socket) => {
     io.emit('players', _data);
 
     socket.on('microphone', (data) => {
+        // console.log(data);
+        // console.log(typeof(data));
+        if(typeof(data) != 'object'){
+            data = JSON.parse(data);
+            // console.log(data);
+        }
         socket.broadcast.emit('microphone', data);
     })
 
