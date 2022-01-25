@@ -93,9 +93,11 @@ function draw() {
         }else{
             textAlign(CENTER);
             text("Don't worry, you are still playing. This is just the simplified view.", windowWidth/2, (windowHeight-(windowHeight*0.038))/2);
-            text("volume: " + GetPlayer(socket.id).volume.toString(), windowWidth/2, ((windowHeight-(windowHeight*0.038))/2) + 80);
-            stroke(255);
-            line((windowWidth/2)-map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40,  (windowWidth/2)+map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40);
+            if(GetPlayer(socket.id) !== null){
+                text("volume: " + GetPlayer(socket.id).volume.toString(), windowWidth/2, ((windowHeight-(windowHeight*0.038))/2) + 80);
+                stroke(255);
+                line((windowWidth/2)-map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40,  (windowWidth/2)+map(GetPlayer(socket.id).volume, 0, 1, 0, 100), ((windowHeight-(windowHeight*0.038))/2) + 40);
+            }
         }
     }
 
@@ -103,6 +105,8 @@ function draw() {
 }
 
 function drawPlayers(num){
+
+    tempPlayers = players.slice();
 
     for(let i=0; i<num; i++){
 
@@ -117,11 +121,11 @@ function drawPlayers(num){
             noStroke();
             fill(255);
             textAlign(LEFT);
-            text(players[i].id + " - p.volume: " + players[i].volume.toString(), 10, (1+i)*15);
-            activeLines[i].update(map(-players[i].volume, -1, 1, -1, 1));
+            text(tempPlayers[i].id + " - p.volume: " + tempPlayers[i].volume.toString(), 10, (1+i)*15);
+            activeLines[i].update(map(-tempPlayers[i].volume, -1, 1, -1, 1));
             activeLines[i].draw();
             noFill();
-            ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, players[i].volume*100*(1+i), players[i].volume*100*(1+i));
+            ellipse(windowWidth/2, (windowHeight-(windowHeight*0.038))/2, tempPlayers[i].volume*100*(1+i), tempPlayers[i].volume*100*(1+i));
         }
     }
 

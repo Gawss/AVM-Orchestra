@@ -36,6 +36,7 @@ app.get('/Calimero', (req, res) => {
 const io = require('socket.io')(server, {
     cors: {
         origin: `http://avm-orchestra.herokuapp.com`, // I copied the origin in the error message and pasted here
+        // origin: "http://localhost:1337",
         methods: ["GET", "POST"],
         credentials: true
       }
@@ -57,13 +58,14 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
-        console.log('Client has disconnected');
+        var disconnectedSocket = socket.id;
+        console.log('Client has disconnected: ' + disconnectedSocket);
 
-        players.pop(GetPlayer(socket.id))
+        players.splice(players.indexOf(GetPlayer(disconnectedSocket)), 1);
 
         var _data = {
             players: players,
-            disconnected: socket.id
+            disconnected: disconnectedSocket
         }
 
         io.emit('playerDisconnected', _data);

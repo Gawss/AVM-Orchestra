@@ -31,8 +31,11 @@ function SocketSetup(){
     
     socket.on('microphone', data => {
 
-        GetPlayer(data.playerID).volume = data.volume;
-        GetPlayer(data.playerID).soundtrackIndex = data.soundtrackIndex;
+        if(GetPlayer(data.playerID) !== null){
+            GetPlayer(data.playerID).volume = data.volume;
+            GetPlayer(data.playerID).soundtrackIndex = data.soundtrackIndex;
+        }
+
 
     });
     
@@ -41,7 +44,8 @@ function SocketSetup(){
         console.log('player has disconnected: ' + data.disconnected);
     
         players = data.players;
-    
+        tempPlayers = players;
+
         if(activeLines[players.indexOf(GetPlayer(data.disconnected))] != null){
             activeLines.splice(players.indexOf(GetPlayer(data.disconnected)), 1);
         }
@@ -51,8 +55,9 @@ function SocketSetup(){
 
 function SendInput(){
 
-    // console.log("Getting player...");
+    console.log("Getting player: " + socket.id);
     if(GetPlayer(socket.id) != null){
+        console.log("Player is here...");
         GetPlayer(socket.id).volume = localVolume;
         GetPlayer(socket.id).soundtrackIndex = soundtrackSelector.selectedIndex;
     }
@@ -70,9 +75,9 @@ function SendInput(){
 }
 
 function GetPlayer(id){
-    for(let i= 0;i < players.length; i++){
-        if(players[i].id == id){
-            return players[i]
+    for(let i= 0;i < tempPlayers.length; i++){
+        if(tempPlayers[i].id == id){
+            return tempPlayers[i]
         }
     }
 

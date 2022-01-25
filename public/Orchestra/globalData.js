@@ -60,6 +60,7 @@ const availableColors = [
 const spectrumColor = [255, 255, 255];
 
 let players = [];
+let tempPlayers = [];
 
 let localVolume = 0;
 let nextLocalVolume = 0;
