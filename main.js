@@ -95,6 +95,13 @@ const needle = require("needle");
 
 
 //Get Tweets from Twitter API
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+    next();
+});
 app.get("/getTweets/:Id", async (req, res) => {
 
     if(process.env.TWITTER_BEARER_TOKEN != null){
