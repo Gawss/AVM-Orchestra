@@ -88,3 +88,31 @@ function GetPlayer(id){
 
     return null;
 }
+
+
+// ----- TWITTER ------
+const needle = require("needle");
+
+
+//Get Tweets from Twitter API
+app.get("/getTweets/:Id", async (req, res) => {
+
+    if(process.env.TWITTER_BEARER_TOKEN != null){
+        try {
+            const response = await needle(
+              "get",
+              `https://api.twitter.com/2/users/${req.params.Id}/tweets`, {
+                  headers: {"authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`
+                  }
+              });
+              console.log(response.body);
+              res.json(response.body);
+          } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: "Internal server error" });
+          }
+    }else{
+        res.send("Service is not available, no server connection");
+    }
+
+});
