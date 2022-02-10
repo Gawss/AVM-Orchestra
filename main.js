@@ -102,13 +102,13 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
     next();
 });
-app.get("/getTweets/:Id", async (req, res) => {
+app.get("/getTweets/:Id/:maxResults", async (req, res) => {
 
     if(process.env.TWITTER_BEARER_TOKEN != null){
         try {
             const response = await needle(
               "get",
-              `https://api.twitter.com/2/users/${req.params.Id}/tweets`, {
+              `https://api.twitter.com/2/users/${req.params.Id}/tweets?max_results=${req.params.maxResults}`, {
                   headers: {"authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`
                   }
               });
