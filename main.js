@@ -47,7 +47,8 @@ const io = require('socket.io')(server, {
         origin: `http://avm-orchestra.herokuapp.com`, // I copied the origin in the error message and pasted here
         // origin: "http://localhost:1337",
         methods: ["GET", "POST"],
-        credentials: true
+        credentials: true,
+        transports: ['websocket', 'polling']
       }
 });
 
